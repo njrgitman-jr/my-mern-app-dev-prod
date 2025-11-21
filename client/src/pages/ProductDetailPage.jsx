@@ -54,7 +54,7 @@ export default function ProductDetailPage() {
 
     return (
         <div style={{ padding: 20, maxWidth: 900 }}>
-            <h1>Product detail (first product) to show preview number 2</h1>
+            <h1>Product detail (first product) to show preview number 3</h1>
 
             <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
                 <div style={{ flex: "0 0 420px" }}>
