@@ -4,8 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "build": "echo 'no build needed'"
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -19,5 +18,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
+  },
+  "vercel": {
+    "output": "standalone"
   }
 }
