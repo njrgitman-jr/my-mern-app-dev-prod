@@ -1,0 +1,19 @@
+name: Dev Preview Deploy
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy-client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Client Preview Deploy
+        run: curl -X POST https://api.vercel.com/v1/integrations/deploy/prj_Bcs1K7F0UmKDWYO68mWgoTigPZVH/PUZYKSlh96
+
+  deploy-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Server Preview Deploy
+        run: curl -X POST https://api.vercel.com/v1/integrations/deploy/prj_C6zpvt1pzECx8AhD2J4AzHUFGPaN/lVj1ycUD7w
