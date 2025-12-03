@@ -11,16 +11,23 @@ const app = express();
 // Detect environment
 const isProduction = process.env.NODE_ENV === "production";
 
-// CORS configuration
+// Allowed origins
 const allowedOrigins = isProduction
-  ? [/^https:\/\/.*\.vercel\.app$/] // Only allow your frontend in production
-  : [/^http:\/\/localhost:\d+$/];   // Local dev
+  ? [
+      // Add your production frontend domain(s) here
+      /^https:\/\/.*\.vercel\.app$/,   // Example for Vercel
+      /^https:\/\/your-frontend-domain\.com$/ // Add more if needed
+    ]
+  : [/^http:\/\/localhost:\d+$/]; // Local dev
 
+// CORS configuration
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // Postman or backend requests
+      // Allow requests with no origin (Postman, mobile apps, server-to-server)
+      if (!origin) return callback(null, true);
 
+      // Check if the origin is allowed
       const isAllowed = allowedOrigins.some((pattern) => pattern.test(origin));
       if (isAllowed) callback(null, true);
       else callback(new Error("❌ Not allowed by CORS"));
@@ -35,7 +42,7 @@ app.use(express.json());
 // Test route
 app.get("/", (req, res) => res.send("🚀 Update-Plan API is running"));
 
-// API routes
+// Routes
 app.use("/api/products", productRoutes);
 
 // MongoDB connection
@@ -45,11 +52,24 @@ mongoose
   .catch((err) => console.error("❌ MongoDB Error:", err));
 
 // Start server
-// ✅ Use Render-provided PORT, fallback to 8080 for local development
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`✔ Server running on PORT ${PORT}`));
 
 export default app;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
