@@ -8,25 +8,20 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = [
-  /^https:\/\/.*\.vercel\.app$/,
-  /^http:\/\/localhost:\d+$/
-];
+const isProduction = process.env.NODE_ENV === "production";
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      const isAllowed = allowedOrigins.some((pattern) => pattern.test(origin));
-      if (isAllowed) callback(null, true);
-      else callback(new Error("Not allowed by CORS"));
-    },
+    origin: isProduction
+      ? [/^https:\/\/.*\.vercel\.app$/]
+      : true,
     credentials: true,
   })
 );
 
 app.use(express.json());
 
+// Test route
 app.get("/", (req, res) => res.send("🚀 Update-Plan API is running"));
 
 // Routes
@@ -38,13 +33,8 @@ mongoose
   .then(() => console.log("✔ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Error:", err));
 
-// Local server for development
-if (process.env.NODE_ENV !== "production") {
-  app.listen(process.env.PORT || 8080, () =>
-    console.log(
-      `✔ Local server running → http://localhost:${process.env.PORT || 8080}`
-    )
-  );
-}
+// Start server
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`✔ Server running on PORT ${PORT}`));
 
 export default app;
