@@ -29,25 +29,35 @@ const allowedOrigins = [
  * → Allows Vercel, Render, etc. in production
  * → NO NETWORK ERROR
  */
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       // Allow server-to-server or Postman
+//       if (!origin) return callback(null, true);
+
+//       // Allow everything in development
+//       if (!isProduction) return callback(null, true);
+
+//       // Check allowed origins in production
+//       const isAllowed = allowedOrigins.some((pattern) => pattern.test(origin));
+
+//       return isAllowed
+//         ? callback(null, true)
+//         : callback(new Error(`❌ CORS blocked for: ${origin}`));
+//     },
+//     credentials: true,
+//   })
+// );
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow server-to-server or Postman
-      if (!origin) return callback(null, true);
-
-      // Allow everything in development
-      if (!isProduction) return callback(null, true);
-
-      // Check allowed origins in production
-      const isAllowed = allowedOrigins.some((pattern) => pattern.test(origin));
-
-      return isAllowed
-        ? callback(null, true)
-        : callback(new Error(`❌ CORS blocked for: ${origin}`));
-    },
+    origin: isProduction
+      ? process.env.FRONTEND_URL
+      : true,
     credentials: true,
   })
 );
+
+
 
 app.use(express.json());
 
