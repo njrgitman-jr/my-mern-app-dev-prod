@@ -1,4 +1,5 @@
-//code 4
+
+//code 3 working fine for both
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -9,45 +10,54 @@ dotenv.config();
 
 const app = express();
 
-// Detect environment
+// Detect if production
 const isProduction = process.env.NODE_ENV === "production";
 
-// Allowed frontend origins
-const allowedOrigins = isProduction
-  ? [
-      process.env.FRONTEND_URL,             // Your Vercel frontend
-      /^https:\/\/.*\.vercel\.app$/,        // Any Vercel domain (preview)
-      /^https:\/\/.*\.onrender\.com$/       // If frontend is ever on Render
-    ]
-  : [/^http:\/\/localhost:\d+$/];           // Local development
+/**
+ * ALLOWED ORIGINS FOR PRODUCTION
+ * You can add Vercel, Render and custom domains here.
+ */
+const allowedOrigins = [
+  /^https:\/\/.*\.vercel\.app$/,       // Vercel frontend
+  /^https:\/\/.*\.onrender\.com$/,     // Render frontend
+  /^https:\/\/yourdomain\.com$/,       // Optional custom domain
+];
 
-// CORS configuration
+/**
+ * CORS SETUP
+ * → Allows all localhost in dev
+ * → Allows Vercel, Render, etc. in production
+ * → NO NETWORK ERROR
+ */
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // Postman or server-to-server
+      // Allow server-to-server or Postman
+      if (!origin) return callback(null, true);
 
-      const isAllowed = allowedOrigins.some((rule) =>
-        rule instanceof RegExp ? rule.test(origin) : rule === origin
-      );
+      // Allow everything in development
+      if (!isProduction) return callback(null, true);
 
-      if (isAllowed) callback(null, true);
-      else callback(new Error(`❌ CORS blocked for origin: ${origin}`));
+      // Check allowed origins in production
+      const isAllowed = allowedOrigins.some((pattern) => pattern.test(origin));
+
+      return isAllowed
+        ? callback(null, true)
+        : callback(new Error(`❌ CORS blocked for: ${origin}`));
     },
     credentials: true,
   })
 );
 
-// Middleware
 app.use(express.json());
 
-// Test route
-app.get("/", (req, res) => res.send("🚀 API working"));
+// Root test route
+app.get("/", (req, res) => res.send("🚀 Update-Plan API is running"));
 
 // API routes
 app.use("/api/products", productRoutes);
 
-// MongoDB connect
+// MongoDB
 mongoose
   .connect(process.env.MONGODB_URI, { dbName: "test" })
   .then(() => console.log("✔ MongoDB Connected"))
@@ -55,84 +65,9 @@ mongoose
 
 // Start server
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () =>
-  console.log(`✔ Server running on PORT ${PORT} | NODE_ENV=${process.env.NODE_ENV}`)
-);
+app.listen(PORT, () => console.log(`✔ Server running on PORT ${PORT}`));
 
 export default app;
-
-
-
-
-//code 3 working fine for both
-// import express from "express";
-// import cors from "cors";
-// import mongoose from "mongoose";
-// import dotenv from "dotenv";
-// import productRoutes from "./routes/product.routes.js";
-
-// dotenv.config();
-
-// const app = express();
-
-// // Detect if production
-// const isProduction = process.env.NODE_ENV === "production";
-
-// /**
-//  * ALLOWED ORIGINS FOR PRODUCTION
-//  * You can add Vercel, Render and custom domains here.
-//  */
-// const allowedOrigins = [
-//   /^https:\/\/.*\.vercel\.app$/,       // Vercel frontend
-//   /^https:\/\/.*\.onrender\.com$/,     // Render frontend
-//   /^https:\/\/yourdomain\.com$/,       // Optional custom domain
-// ];
-
-// /**
-//  * CORS SETUP
-//  * → Allows all localhost in dev
-//  * → Allows Vercel, Render, etc. in production
-//  * → NO NETWORK ERROR
-//  */
-// app.use(
-//   cors({
-//     origin: (origin, callback) => {
-//       // Allow server-to-server or Postman
-//       if (!origin) return callback(null, true);
-
-//       // Allow everything in development
-//       if (!isProduction) return callback(null, true);
-
-//       // Check allowed origins in production
-//       const isAllowed = allowedOrigins.some((pattern) => pattern.test(origin));
-
-//       return isAllowed
-//         ? callback(null, true)
-//         : callback(new Error(`❌ CORS blocked for: ${origin}`));
-//     },
-//     credentials: true,
-//   })
-// );
-
-// app.use(express.json());
-
-// // Root test route
-// app.get("/", (req, res) => res.send("🚀 Update-Plan API is running"));
-
-// // API routes
-// app.use("/api/products", productRoutes);
-
-// // MongoDB
-// mongoose
-//   .connect(process.env.MONGODB_URI, { dbName: "test" })
-//   .then(() => console.log("✔ MongoDB Connected"))
-//   .catch((err) => console.error("❌ MongoDB Error:", err));
-
-// // Start server
-// const PORT = process.env.PORT || 8080;
-// app.listen(PORT, () => console.log(`✔ Server running on PORT ${PORT}`));
-
-// export default app;
 
 
 
