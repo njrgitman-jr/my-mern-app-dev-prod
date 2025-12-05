@@ -22,33 +22,27 @@ export default function ProductDetailPage() {
   const [err, setErr] = useState(null);
 
   useEffect(() => {
-    if (isMobile) {
-      console.log("Mobile detected — skipping backend request");
-      setLoading(false);
-      setErr("API requests disabled on mobile until backend is deployed");
-      return;
+  let mounted = true;
+
+  const fetchFirst = async () => {
+    try {
+      const res = await api.get("/api/products/first");
+      if (!mounted) return;
+      setProduct(res.data);
+    } catch (error) {
+      console.error("Failed to fetch first product:", error);
+      setErr(error?.response?.data?.message || error.message || "Failed to load");
+    } finally {
+      if (mounted) setLoading(false);
     }
+  };
 
-    let mounted = true;
+  fetchFirst();
+  return () => {
+    mounted = false;
+  };
+}, []);
 
-    const fetchFirst = async () => {
-      try {
-        const res = await api.get("/api/products/first");
-        if (!mounted) return;
-        setProduct(res.data);
-      } catch (error) {
-        console.error("Failed to fetch first product:", error);
-        setErr(error?.response?.data?.message || error.message || "Failed to load");
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    fetchFirst();
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   if (loading) return <div>Loading product…</div>;
   if (err) return <div style={{ color: "red" }}>Error: {err}</div>;
